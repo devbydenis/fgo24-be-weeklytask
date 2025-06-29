@@ -96,4 +96,50 @@ func Transfer(senderID, receiverID uuid.UUID, amount float64, description, notes
 	return tx.Commit(context.Background())
 }
 
+// TopUp - Top up saldo user
+func TopUp(userID uuid.UUID, amount float64, description string) error {
+	// conncect to db
+	conn, err := u.DBConnect()
+	if err != nil {
+		fmt.Println("IsEmailExist error connet to db:", err)
+		return err
+	}
+
+	// jangan lupa tutup kalo udah selesai
+	defer func() {
+		conn.Conn().Close(context.Background())
+	}()
+	
+	// Start transaction
+
+	tx, err := conn.Begin(context.Background())
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(context.Background())
+
+	// Insert transaksi
+	transactionID := uuid.New()
+	completedAt := time.Now()
+
+	_, err = tx.Exec(context.Background(),
+		`INSERT INTO transactions (id, receiver_id, transaction_type, amount, status, description, completed_at)
+				VALUES ($1, $2, 'TOP_UP', $3, 'COMPLETED', $4, $5)`,
+		transactionID, userID, amount, description, completedAt)
+	if err != nil {
+		return err
+	}
+
+	// Update balance
+	_, err = tx.Exec(context.Background(),
+		`UPDATE users SET balance = balance + $1 WHERE id = $2`,
+		amount, userID)
+	if err != nil {
+		return err
+	}
+
+	// Commit transaction
+	return tx.Commit(context.Background())
+}
+
 

@@ -80,3 +80,40 @@ func TransferHandler(ctx *gin.Context) {
 }
 
 // TopUp - Handle balance top up
+func  TopUpHandler(ctx *gin.Context) {
+    var req TopUpRequest
+    
+    // Bind JSON request
+    if err := ctx.ShouldBindJSON(&req); err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{
+            "error":   "Invalid request data",
+            "details": err.Error(),
+        })
+        return
+    }
+
+    // Parse UUID
+    userID, err := uuid.Parse(req.UserID)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{
+            "error": "Invalid user ID",
+        })
+        return
+    }
+
+    // Top up balance
+    err = models.TopUp(userID, req.Amount, req.Description)
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{
+            "error": "Top up failed",
+        })
+        return
+    }
+
+    // Success response
+    ctx.JSON(http.StatusOK, gin.H{
+        "message": "Top up successful",
+        "amount":  req.Amount,
+    })
+}
+
