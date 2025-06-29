@@ -48,6 +48,10 @@ type UserWithProfile struct {
 	Profile Profile `json:"profile"`
 }
 
+type BalanceRequest struct {
+	Amount float64 `json:"amount"`
+}
+
 func IsEmailExist(email string) bool {
 	// conncect to db
 	conn, err := u.DBConnect()
@@ -81,55 +85,6 @@ func IsEmailExist(email string) bool {
 
 	return false
 }
-
-
-// func GetProfileFromDb(user_id string) (GetProfileFromDbType, error) {
-// 	// conncect to db
-// 	conn, err := u.DBConnect()
-// 	if err != nil {
-// 		fmt.Println("IsEmailExist error connet to db:", err)
-// 		return GetProfileFromDbType{}, err
-// 	}
-
-// 	// jangan lupa tutup kalo udah selesai
-// 	defer func() {
-// 		conn.Conn().Close(context.Background())
-// 	}()
-
-// 	// check if email exist
-// 	rows, err := conn.Query(
-// 		context.Background(),
-// 		`
-// 			SELECT 
-// 				p.full_name,
-// 				p.phone,
-// 				p.profile_image,
-// 				u.email,
-// 				u.balance
-// 			FROM profiles p
-// 			JOIN users u ON p.user_id = u.id
-// 			WHERE u.id = $1
-// 		`,
-// 		user_id)
-// 	if err != nil {
-// 		fmt.Println("GetProfileFromDB error query:", err)
-// 		return GetProfileFromDbType{}, err
-// 	}
-
-// 	// collect row and map to struxt
-// 	profiles, err := pgx.CollectRows[GetProfileFromDbType](rows, pgx.RowToStructByName)
-// 	if err != nil {
-// 		fmt.Println("GetProfileFromDB error collect row:", err)
-// 		return GetProfileFromDbType{}, err
-// 	}
-
-// 	fmt.Println("GetProfileFromDB users:", profiles)
-// 	if len(profiles) > 0 {
-// 		return profiles[0], nil
-// 	}
-
-// 	return GetProfileFromDbType{}, nil
-// } 
 
 func GetProfileFromDb(id uuid.UUID) (*UserWithProfile, error) {
 	var user User

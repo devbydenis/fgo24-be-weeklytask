@@ -46,3 +46,28 @@ func GetProfileHandler(ctx *gin.Context) {
 	})
 }
 
+func GetBalanceHandler(ctx *gin.Context) {
+    // Get user ID from URL parameter
+    userIDStr := ctx.Param("id")
+    userID, err := uuid.Parse(userIDStr)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{
+            "error": "Invalid user ID",
+        })
+        return
+    }
+
+    // Get user
+    user, err := m.GetProfileFromDb(userID)
+    if err != nil {
+        ctx.JSON(http.StatusNotFound, gin.H{
+            "error": "User not found",
+        })
+        return
+    }
+
+    // Success response
+    ctx.JSON(http.StatusOK, gin.H{
+        "balance": user.Balance,
+    })
+}

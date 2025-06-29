@@ -8,4 +8,5 @@ import (
 
 func UsersRouters(r *gin.RouterGroup) {
 	r.GET("/profile/:id", c.GetProfileHandler)
+	r.GET("/balance/:id", c.GetBalanceHandler) 
 }
