@@ -117,3 +117,29 @@ func  TopUpHandler(ctx *gin.Context) {
     })
 }
 
+// GetHistory - Get transaction history
+func GetHistoryHandler(ctx *gin.Context) {
+    // Get user ID from URL parameter
+    userIDStr := ctx.Param("id")
+    userID, err := uuid.Parse(userIDStr)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{
+            "error": "Invalid user ID",
+        })
+        return
+    }
+
+    // Get history
+    history, err := models.GetHistory(userID, 10) // Limit 10 transaksi
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{
+            "error": "Failed to get transaction history",
+        })
+        return
+    }
+
+    // Success response
+    ctx.JSON(http.StatusOK, gin.H{
+        "history": history,
+    })
+}
