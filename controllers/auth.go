@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func RegisterHandler(ctx *gin.Context) {
@@ -65,8 +66,9 @@ func RegisterHandler(ctx *gin.Context) {
 		})
 		return
 	}
-
-	err = m.InsertUserToDB(req.Email, req.Password, req.Pin)
+	userUUID := u.GenerateUUID()
+	parseUserUUID, err := uuid.Parse(userUUID)
+	err = m.InsertUserToDB(req.Email, req.Password, req.Pin, parseUserUUID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, u.Response{
 			Status:  "Failed",
@@ -140,3 +142,4 @@ func LoginHandler(ctx *gin.Context) {
 		Message: "Login Success",
 	})	
 }
+
