@@ -46,3 +46,5 @@ CREATE INDEX idx_transactions_created ON transactions(created_at);
 
 
 SELECT * FROM users;
+
+ALTER TABLE users RENAME COLUMN pin_hash TO pin;

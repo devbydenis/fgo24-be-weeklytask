@@ -85,6 +85,58 @@ func RegisterHandler(ctx *gin.Context) {
 
 }
 
-func LoginHandler(c *gin.Context) {
-	
+func LoginHandler(ctx *gin.Context) {
+	var req m.LoginRequest
+
+	err := ctx.ShouldBind(&req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Status:  "Failed",
+			Success: false,
+			Message: "Bad Request",
+			Errors:  err.Error(),
+		})
+	}
+
+	if req.Email == "" {
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Status:  "Failed",
+			Success: false,
+			Message: "Email is required",
+		})
+		return
+	}
+
+	if req.Password == "" {
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Status:  "Failed",
+			Success: false,
+			Message: "Password is required",
+		})
+		return
+	}
+
+	if req.Pin == "" {
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Status:  "Failed",
+			Success: false,
+			Message: "Pin is required",
+		})
+		return
+	}
+
+	if !m.MatchUserInDatabase(req.Email, req.Password, req.Pin) {
+		ctx.JSON(http.StatusUnauthorized, u.Response{
+			Status:  "Failed",
+			Success: false,
+			Message: "Unauthorized. Make sure your email, password and pin is correct",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, u.Response{
+		Status:  "Success",
+		Success: true,
+		Message: "Login Success",
+	})	
 }
